@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "Scene-sible",
+  "version": "1.0",
+  "description": "Helps you make informed decisions by providing content ratings",
+  "homepage_url": "https://github.com/CodesWithRobi/Scene-sible",
+  "icons": {
+    "48": "icons/icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "https://www.google.com/search*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/search*"
+      ],
+      "js": [
+        "content_scripts/scene_sible.js"
+      ]
+    }
+  ],
+  "browser_action": {
+    "default_icon": "icons/icon.png",
+    "default_popup": "popup/popup.html"
+  }
+}
