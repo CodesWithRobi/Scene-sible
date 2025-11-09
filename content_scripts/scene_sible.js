@@ -1,9 +1,8 @@
 const shareButton = document.querySelector('[aria-label="Share"]');
 const topstuff = document.getElementById("topstuff");
 
-// --- FIX 2: Check for ALL required elements to prevent crashes ---
 if (!shareButton || !topstuff) {
-  console.log("Missing required elements (Share, topstuff, or All button)");
+  console.log("Scene-sible: Missing required elements (Share button or topstuff container).");
 } else {
   const styles = `
         /* AI Overview Container Styles */
@@ -21,8 +20,8 @@ if (!shareButton || !topstuff) {
         .MyTwIe { max-width: 632px; }
         .KMCbD { border-bottom: 1px solid var(--m3c17); width: 100%; margin-top: 12px; }
 
-        /* NEW Loading Animation Styles (from user) */
-        .hoqQCc { padding-bottom: 20px; } /* Add padding to match original loader body */
+        /* Loading Animation Styles */
+        .hoqQCc { padding-bottom: 20px; }
         .MyTwIe { max-width: 632px; }
         .Ry8K5c {
             border-radius: 20px;
@@ -43,7 +42,6 @@ if (!shareButton || !topstuff) {
         }
         .ixPFxb { position: absolute; height: 100%; }
         
-        /* Animation classes */
         .dGkdc, .dkKvuc, .wim3ad { 
             animation: 6000ms cubic-bezier(0.5,0,0.3,1) 0s infinite normal both running gradient-loading-slide;
         }
@@ -54,7 +52,6 @@ if (!shareButton || !topstuff) {
         }
         .u7Pf1b { display: none; }
 
-
         /* Google's Content Styles */
         .f5cPye { letter-spacing: var(--m3t13); }
         .p2M1Qe .f5cPye { color: var(--YLNNHc, #e8e8e8); font-family: Google Sans, Arial, sans-serif; font-size: 16px; line-height: 24px; position: relative; }
@@ -62,12 +59,6 @@ if (!shareButton || !topstuff) {
         .WaaZC:first-of-type .rPeykc:first-child { margin-top: 0; }
         .f5cPye ul { font-size: 16px; line-height: 24px; margin: 10px 0 20px 0; padding-inline-start: 16px; }
         .f5cPye li { padding-inline-start: 4px; margin-bottom: 8px; list-style: inherit; }
-
-        /* Style for our new "virtual" button tab (Not used here, but safe) */
-        .mXwfNd { display: flex; min-height: 48px; padding: 0 12px; align-items: end; }
-        .R1QWuf { color: #80868b; font-weight: 500; display: inline-block; white-space: nowrap; font-size: 14px; line-height: 20px; border-bottom: 3px solid transparent; padding-bottom: 8px; }
-        .C6AK7c { text-decoration: none; }
-        [role="listitem"][selected] .R1QWuf { border-bottom-color: var(--YLNNHc, #e8e8e8); color: var(--YLNNHc, #e8e8e8); }
     `;
   const styleSheet = document.createElement("style");
   styleSheet.type = "text/css";
@@ -92,7 +83,7 @@ if (!shareButton || !topstuff) {
                   <div class="nk9vdc GYaNDc" style="flex-grow:1">
                       <div class="Fzsovc">
                           <div style="animation:0.4s cubic-bezier(0.4, 0, 0.2, 1) both low-confidence-header-fade-in">
-                              Praying to St.Carlo Acutis...
+                              Praying to St. Carlo Acutis...
                           </div>
                       </div>
                   </div>
@@ -109,28 +100,71 @@ if (!shareButton || !topstuff) {
       </div>
   `;
 
+  // This is a mock function. In a real extension, this would make an API call.
+  async function getAnswer(movieTitle) {
+    console.log(`Getting chastity score for: ${movieTitle}`);
+    // Simulate an API call by returning a mock JSON object.
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve({
+          "morality_scale": 7,
+          "watchability": 8,
+          "sexual_activity": [
+            { "timestamp": "1:05:20", "hint": "Implied sexual activity, no nudity" }
+          ],
+          "nudity": [
+            { "timestamp": "0:55:10", "hint": "Brief female nudity, side view" }
+          ],
+          "kissing": [
+            { "timestamp": "0:25:45", "hint": "Passionate kiss" },
+            { "timestamp": "1:30:12", "hint": "Simple kiss" }
+          ]
+        });
+      }, 1000);
+    });
+  }
+
   function getRenderedContent(data) {
-    const listItemsHTML = data.items.map((item) => `<li>${item}</li>`).join("");
+    const sexualActivityHTML = data.sexual_activity.map(item => `<li>${item.timestamp}: ${item.hint}</li>`).join('');
+    const nudityHTML = data.nudity.map(item => `<li>${item.timestamp}: ${item.hint}</li>`).join('');
+    const kissingHTML = data.kissing.map(item => `<li>${item.timestamp}: ${item.hint}</li>`).join('');
+
     return `
-          <div class="YzCcne p2M1Qe" style="margin-bottom: 30px;">
-              <div class="hdzaWe">
-                  <div class="OZ9ddf WAUd4">
-                      <div class="nk9vdc GYaNDc" style="flex-grow:1">
+        <div class="YzCcne p2M1Qe" style="margin-bottom: 30px;">
+            <div class="hdzaWe">
+                <div class="OZ9ddf WAUd4">
+                    <div class="nk9vdc GYaNDc" style="flex-grow:1">
                         <svg class="fWWlmf JzISke" height="22" width="22" aria-hidden="true" viewBox="0 0 471 471" xmlns="http://www.w3.org/2000/svg"><path fill="var(--m3c23)" d="M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z"></path></svg>
-                          <div class="Fzsovc" role="heading" aria-level="2">${data.title}</div>
-                      </div>
-                  </div>
-                  <div class="GkDqAd">
-                      <div class="f5cPye">
-                          <div class="WaaZC"><div class="rPeykc"><span>${data.body}</span></div></div>
-                          <div class="WaaZC">
-                              <ul style="margin: 10px 0 0 20px; list-style-type: disc;">${listItemsHTML}</ul>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      `;
+                        <div class="Fzsovc" role="heading" aria-level="2">Scene-sible Score</div>
+                    </div>
+                </div>
+                <div class="GkDqAd">
+                    <div class="f5cPye">
+                        <div class="WaaZC"><div class="rPeykc"><span><strong>Morality Scale:</strong> ${data.morality_scale}/10</span></div></div>
+                        <div class="WaaZC"><div class="rPeykc"><span><strong>Watchability:</strong> ${data.watchability}/10</span></div></div>
+                        
+                        ${data.sexual_activity.length > 0 ? `
+                        <div class="WaaZC">
+                            <div class="rPeykc"><strong>Sexual Activity:</strong></div>
+                            <ul style="margin: 0 0 10px 20px; list-style-type: disc;">${sexualActivityHTML}</ul>
+                        </div>` : ''}
+
+                        ${data.nudity.length > 0 ? `
+                        <div class="WaaZC">
+                            <div class="rPeykc"><strong>Nudity:</strong></div>
+                            <ul style="margin: 0 0 10px 20px; list-style-type: disc;">${nudityHTML}</ul>
+                        </div>` : ''}
+
+                        ${data.kissing.length > 0 ? `
+                        <div class="WaaZC">
+                            <div class="rPeykc"><strong>Kissing:</strong></div>
+                            <ul style="margin: 0 0 10px 20px; list-style-type: disc;">${kissingHTML}</ul>
+                        </div>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
   }
 
   let loading = false;
@@ -144,21 +178,14 @@ if (!shareButton || !topstuff) {
       aiResult.style.opacity = "1";
     });
 
-    const data = await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          title: "Custom AI Overview",
-          body: "This custom panel was triggered by the 'Share' button. It's injected right before the main results (#search) and uses Google's native styles.",
-          items: [
-            "Triggered by 'Share'",
-            "Hides main results (#taw, #search)",
-            "Click 'All' to go back",
-          ],
-        });
-      }, 2000); // 2-second delay
-    });
+    const movieTitleInput = document.querySelector('input[name="q"]');
+    const movieTitle = movieTitleInput ? movieTitleInput.value : "Unknown Movie";
+    const data = await getAnswer(movieTitle);
 
-    if (aiResult.style.display !== "block") {
+    if (aiResult.style.display !== "block" || !data) {
+      if (topstuff) topstuff.style.display = "block";
+      aiResult.style.display = "none";
+      aiResult.style.opacity = "0";
       loading = false;
       return;
     }
@@ -171,8 +198,10 @@ if (!shareButton || !topstuff) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (aiResult.style.display === "none") showAiResult();
+    if (aiResult.style.display === "none") {
+      showAiResult();
+    }
   });
 
-  console.log("Catholic takeover success..");
+  console.log("Scene-sible content script loaded successfully.");
 }
