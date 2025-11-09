@@ -1,14 +1,16 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Scene-sible",
   "version": "1.0",
-  "description": "Helps you make informed decisions by providing content ratings",
+  "author": "Robinson J",
   "homepage_url": "https://github.com/CodesWithRobi/Scene-sible",
   "icons": {
     "48": "icons/icon.png"
   },
   "permissions": [
-    "activeTab",
+    "activeTab"
+  ],
+  "host_permissions": [
     "https://www.google.com/search*"
   ],
   "content_scripts": [
@@ -21,7 +23,7 @@
       ]
     }
   ],
-  "browser_action": {
+  "action": {
     "default_icon": "icons/icon.png",
     "default_popup": "popup/popup.html"
   }
