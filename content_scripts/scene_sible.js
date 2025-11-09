@@ -87,29 +87,54 @@ if (!shareButton || !topstuff) {
 
   topstuff.before(aiResult);
 
-  const loaderHTML = `
-      <div class="YzCcne" style="margin-bottom: 30px;">
-          <div class="hdzaWe">
-              <div class="OZ9ddf WAUd4">
-                  <div class="nk9vdc GYaNDc" style="flex-grow:1">
-                      <div class="Fzsovc">
-                          <div style="animation:0.4s cubic-bezier(0.4, 0, 0.2, 1) both low-confidence-header-fade-in">
-                              Praying to St. Carlo Acutis...
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              
-              <div class="MyTwIe" aria-valuetext="Generating" role="progressbar">
-                  <div class="Ry8K5c FmaImf ToDgQ" style="width:100%"><div class="VLPwxc dGkdc" style="animation-delay:-1600ms"></div><div class="VLPwxc dkKvuc" style="animation-delay:400ms"></div><div class="VLPwxc wim3ad" style="animation-delay:2400ms"></div><div class="ixPFxb" style="filter:url(#_DEgQabqMF8eUseMPgri58AM_4)"></div></div>
-                  <div class="Ry8K5c FmaImf ToDgQ" style="width:90%"><div class="VLPwxc dGkdc" style="animation-delay:-1400ms"></div><div class="VLPwxc dkKvuc" style="animation-delay:600ms"></div><div class="VLPwxc wim3ad" style="animation-delay:2600ms"></div><div class="ixPFxb" style="filter:url(#_DEgQabqMF8eUseMPgri58AM_4)"></div></div>
-                  <div class="Ry8K5c FmaImf ToDgQ" style="width:92%"><div class="VLPwxc dGkdc" style="animation-delay:-1200ms"></div><div class="VLPwxc dkKvuc" style="animation-delay:800ms"></div><div class="VLPwxc wim3ad" style="animation-delay:2800ms"></div><div class="ixPFxb" style="filter:url(#_DEgQabqMF8eUseMPgri58AM_4)"></div></div>
-                  <div class="Ry8K5c ToDgQ" style="width:75%"><div class="VLPwxc dGkdc" style="animation-delay:-1000ms"></div><div class="VLPwxc dkKvuc" style="animation-delay:1000ms"></div><div class="VLPwxc wim3ad" style="animation-delay:3000ms"></div><div class="ixPFxb" style="filter:url(#_DEgQabqMF8eUseMPgri58AM_4)"></div></div>
-                  <svg class="u7Pf1b" aria-hidden="true"><defs><filter id="_DEgQabqMF8eUseMPgri58AM_4"><feTurbulence baseFrequency="1.5" numOctaves="5" seed="24"></feTurbulence><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 9 -4"></feColorMatrix><feComposite in="SourceGraphic" operator="in"></feComposite></filter></defs></svg>
-              </div>
-          </div>
-      </div>
-  `;
+  function getLoader() {
+    return createDOM("div", { className: "YzCcne", style: "margin-bottom: 30px;" },
+        createDOM("div", { className: "hdzaWe" },
+            createDOM("div", { className: "OZ9ddf WAUd4" },
+                createDOM("div", { className: "nk9vdc GYaNDc", style: "flex-grow:1" },
+                    createDOM("div", { className: "Fzsovc" },
+                        createDOM("div", { style: "animation:0.4s cubic-bezier(0.4, 0, 0.2, 1) both low-confidence-header-fade-in" }, "Praying to St. Carlo Acutis...")
+                    )
+                )
+            ),
+            createDOM("div", { className: "MyTwIe", "aria-valuetext": "Generating", role: "progressbar" },
+                createDOM("div", { className: "Ry8K5c FmaImf ToDgQ", style: "width:100%" },
+                    createDOM("div", { className: "VLPwxc dGkdc", style: "animation-delay:-1600ms" }),
+                    createDOM("div", { className: "VLPwxc dkKvuc", style: "animation-delay:400ms" }),
+                    createDOM("div", { className: "VLPwxc wim3ad", style: "animation-delay:2400ms" }),
+                    createDOM("div", { className: "ixPFxb", style: "filter:url(#_DEgQabqMF8eUseMPgri58AM_4)" })
+                ),
+                createDOM("div", { className: "Ry8K5c FmaImf ToDgQ", style: "width:90%" },
+                    createDOM("div", { className: "VLPwxc dGkdc", style: "animation-delay:-1400ms" }),
+                    createDOM("div", { className: "VLPwxc dkKvuc", style: "animation-delay:600ms" }),
+                    createDOM("div", { className: "VLPwxc wim3ad", style: "animation-delay:2600ms" }),
+                    createDOM("div", { className: "ixPFxb", style: "filter:url(#_DEgQabqMF8eUseMPgri58AM_4)" })
+                ),
+                createDOM("div", { className: "Ry8K5c FmaImf ToDgQ", style: "width:92%" },
+                    createDOM("div", { className: "VLPwxc dGkdc", style: "animation-delay:-1200ms" }),
+                    createDOM("div", { className: "VLPwxc dkKvuc", style: "animation-delay:800ms" }),
+                    createDOM("div", { className: "VLPwxc wim3ad", style: "animation-delay:2800ms" }),
+                    createDOM("div", { className: "ixPFxb", style: "filter:url(#_DEgQabqMF8eUseMPgri58AM_4)" })
+                ),
+                createDOM("div", { className: "Ry8K5c ToDgQ", style: "width:75%" },
+                    createDOM("div", { className: "VLPwxc dGkdc", style: "animation-delay:-1000ms" }),
+                    createDOM("div", { className: "VLPwxc dkKvuc", style: "animation-delay:1000ms" }),
+                    createDOM("div", { className: "VLPwxc wim3ad", style: "animation-delay:3000ms" }),
+                    createDOM("div", { className: "ixPFxb", style: "filter:url(#_DEgQabqMF8eUseMPgri58AM_4)" })
+                ),
+                createDOM("svg", { className: "u7Pf1b", "aria-hidden": "true" },
+                    createDOM("defs", null,
+                        createDOM("filter", { id: "_DEgQabqMF8eUseMPgri58AM_4" },
+                            createDOM("feTurbulence", { baseFrequency: "1.5", numOctaves: "5", seed: "24" }),
+                            createDOM("feColorMatrix", { values: "0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 9 -4" }),
+                            createDOM("feComposite", { in: "SourceGraphic", operator: "in" })
+                        )
+                    )
+                )
+            )
+        )
+    );
+}
 
   async function getAnswer(prompt) {
     return new Promise((resolve) => {
@@ -124,55 +149,60 @@ if (!shareButton || !topstuff) {
     });
   }
 
-  function getRenderedContent(data) {
-    const sexualActivityHTML = data.sexual_activity.map(item => `<li>${item.timestamp}: ${item.hint}</li>`).join('');
-    const nudityHTML = data.nudity.map(item => `<li>${item.timestamp}: ${item.hint}</li>`).join('');
-    const kissingHTML = data.kissing.map(item => `<li>${item.timestamp}: ${item.hint}</li>`).join('');
+function createDOM(type, props, ...children) {
+    const elem = document.createElement(type);
+    Object.assign(elem, props);
+    for (const child of children) {
+        if (typeof child === "string") {
+            elem.appendChild(document.createTextNode(child));
+        } else if (child) {
+            elem.appendChild(child);
+        }
+    }
+    return elem;
+}
 
-    return `
-        <div class="YzCcne p2M1Qe" style="margin-bottom: 30px;">
-            <div class="hdzaWe">
-                <div class="OZ9ddf WAUd4">
-                    <div class="nk9vdc GYaNDc" style="flex-grow:1">
-                      <svg class="fWWlmf JzISke" height="22" width="22" aria-hidden="true" viewBox="0 0 471 471" xmlns="http://www.w3.org/2000/svg"><path fill="var(--m3c23)" d="M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z"></path></svg>
-                        <div class="Fzsovc" role="heading" aria-level="2">Calculated strategies to avoid near occasions..</div>
-                    </div>
-                </div>
-                <div class="GkDqAd">
-                    <div class="f5cPye">
-                        <div class="WaaZC"><div class="rPeykc"><span><strong>Morality Scale:</strong> ${data.morality_scale}/10</span></div></div>
-                        <div class="WaaZC"><div class="rPeykc"><span><strong>Watchability:</strong> ${data.watchability}/10</span></div></div>
-                        
-                        ${data.sexual_activity.length > 0 ? `
-                        <div class="WaaZC">
-                            <div class="rPeykc"><strong>Sexual Activity:</strong></div>
-                            <ul style="margin: 0 0 10px 20px; list-style-type: disc;">${sexualActivityHTML}</ul>
-                        </div>` : ''}
+function getRenderedContent(data) {
+    const createListItem = (item) => createDOM("li", null, `${item.timestamp}: ${item.hint}`);
 
-                        ${data.nudity.length > 0 ? `
-                        <div class="WaaZC">
-                            <div class="rPeykc"><strong>Nudity:</strong></div>
-                            <ul style="margin: 0 0 10px 20px; list-style-type: disc;">${nudityHTML}</ul>
-                        </div>` : ''}
+    const createSection = (title, items) => {
+        if (items.length === 0) return null;
+        return createDOM("div", { className: "WaaZC" },
+            createDOM("div", { className: "rPeykc" }, createDOM("strong", null, title)),
+            createDOM("ul", { style: "margin: 0 0 10px 20px; list-style-type: disc;" }, ...items.map(createListItem))
+        );
+    };
 
-                        ${data.kissing.length > 0 ? `
-                        <div class="WaaZC">
-                            <div class="rPeykc"><strong>Kissing:</strong></div>
-                            <ul style="margin: 0 0 10px 20px; list-style-type: disc;">${kissingHTML}</ul>
-                        </div>` : ''}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-  }
+    return createDOM("div", { className: "YzCcne p2M1Qe", style: "margin-bottom: 30px;" },
+        createDOM("div", { className: "hdzaWe" },
+            createDOM("div", { className: "OZ9ddf WAUd4" },
+                createDOM("div", { className: "nk9vdc GYaNDc", style: "flex-grow:1" },
+                    createDOM("svg", { className: "fWWlmf JzISke", height: 22, width: 22, "aria-hidden": "true", viewBox: "0 0 471 471", xmlns: "http://www.w3.org/2000/svg" },
+                        createDOM("path", { fill: "var(--m3c23)", d: "M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z" })
+                    ),
+                    createDOM("div", { className: "Fzsovc", role: "heading", "aria-level": "2" }, "Calculated strategies to avoid near occasions..")
+                )
+            ),
+            createDOM("div", { className: "GkDqAd" },
+                createDOM("div", { className: "f5cPye" },
+                    createDOM("div", { className: "WaaZC" }, createDOM("div", { className: "rPeykc" }, createDOM("span", null, createDOM("strong", null, "Morality Scale:"), ` ${data.morality_scale}/10`))),
+                    createDOM("div", { className: "WaaZC" }, createDOM("div", { className: "rPeykc" }, createDOM("span", null, createDOM("strong", null, "Watchability:"), ` ${data.watchability}/10`))),
+                    createSection("Sexual Activity:", data.sexual_activity),
+                    createSection("Nudity:", data.nudity),
+                    createSection("Kissing:", data.kissing)
+                )
+            )
+        )
+    );
+}
 
   let loading = false;
   async function showAiResult() {
     if (loading) return;
     loading = true;
     if (topstuff) topstuff.style.display = "none";
-    aiResult.innerHTML = loaderHTML;
+    aiResult.innerHTML = "";
+    aiResult.appendChild(getLoader());
     aiResult.style.display = "block";
     requestAnimationFrame(() => {
       aiResult.style.opacity = "1";
@@ -190,7 +220,8 @@ if (!shareButton || !topstuff) {
       return;
     }
 
-    aiResult.innerHTML = getRenderedContent(data);
+    aiResult.innerHTML = "";
+    aiResult.appendChild(getRenderedContent(data));
     loading = false;
   }
 
