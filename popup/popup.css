@@ -32,36 +32,40 @@ body {
   margin-bottom: 30px;
 }
 
-/* Button styling */
-.popup a {
-  display: inline-block;
-  margin: 10px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 30px;
-  /* Rounded buttons */
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+/* Input and Button Styling */
+.api-key-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.github {
-  background-color: #333;
+#apiKey {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #61dafb;
+  border-radius: 5px;
+  background-color: #20232a;
+  color: #abb2bf;
+  font-size: 14px;
 }
 
-.linkedin {
-  background-color: #0077b5;
-}
-
-/* Button hover effects */
-.popup a:hover {
+#saveBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
   background-color: #61dafb;
-  /* Light blue hover for a consistent theme */
   color: #20232a;
-  /* Text changes to background color */
-  box-shadow: 0 0 20px rgba(97, 218, 251, 0.6);
-  /* Cool glow effect */
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#saveBtn:hover {
+  background-color: #4a9cb3;
+}
+
+.status {
+  font-size: 14px;
+  color: #61dafb;
+  min-height: 20px;
 }

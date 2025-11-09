@@ -1,12 +1,23 @@
 const shareButton = document.querySelector('[aria-label="Share"]');
 const topstuff = document.getElementById("topstuff");
 
+// --- Check for required elements to prevent crashes ---
 if (!shareButton || !topstuff) {
   console.log("Scene-sible: Missing required elements (Share button or topstuff container).");
 } else {
+  // Correctly replace the SVG inside the share button
+  const originalSvg = shareButton.querySelector('svg');
+  if (originalSvg) {
+    originalSvg.outerHTML = `
+      <svg class="fWWlmf JzISke" height="22" width="22" aria-hidden="true" viewBox="0 0 471 471" xmlns="http://www.w3.org/2000/svg">
+        <path fill="var(--m3c23)" d="M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z"></path>
+      </svg>
+    `;
+  }
+
   const styles = `
         /* AI Overview Container Styles */
-        .YzCcne { --m3c9: #eef0ff; --m3c17: #424654; --IXoxUe: #9e9e9e; --m3c23: #7aacff; }
+        .YzCcne { --m3c9: #f5c5c9; --m3c17: #424654; --IXoxUe: #9e9e9e; --m3c23: #cd1924; }
         .hdzaWe { font-family: Google Sans, Arial, sans-serif; position: relative; }
         .WAUd4 { padding: 16px 0; }
         .OZ9ddf { align-items: center; display: flex; flex-direction: row; grid-gap: 16px; justify-content: space-between; position: relative; }
@@ -32,10 +43,10 @@ if (!shareButton || !topstuff) {
         .ToDgQ {
             position: relative;
             overflow: clip;
-            background: var(--m3c13, #3c4043); 
+            background: var(--m3c13, #8b0f17); 
         }
         .VLPwxc {
-            background: linear-gradient(110deg,transparent 15%,var(--m3c13, #3c4043) 30%,var(--m3c20, #5f6368) 60%,var(--m3c20, #5f6368) 75%,var(--m3c13, #3c4043) 90%,transparent 95%);
+            background: linear-gradient(110deg,transparent 15%,var(--m3c13, #8b0f17) 30%,var(--m3c20, #cd1924) 60%,var(--m3c20, #cd1924) 75%,var(--m3c13, #8b0f17) 90%,transparent 95%);
             width: 300%;
             position: absolute;
             height: 100%;
@@ -100,28 +111,158 @@ if (!shareButton || !topstuff) {
       </div>
   `;
 
-  // This is a mock function. In a real extension, this would make an API call.
-  async function getAnswer(movieTitle) {
-    console.log(`Getting chastity score for: ${movieTitle}`);
-    // Simulate an API call by returning a mock JSON object.
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve({
-          "morality_scale": 7,
-          "watchability": 8,
-          "sexual_activity": [
-            { "timestamp": "1:05:20", "hint": "Implied sexual activity, no nudity" }
-          ],
-          "nudity": [
-            { "timestamp": "0:55:10", "hint": "Brief female nudity, side view" }
-          ],
-          "kissing": [
-            { "timestamp": "0:25:45", "hint": "Passionate kiss" },
-            { "timestamp": "1:30:12", "hint": "Simple kiss" }
-          ]
-        });
-      }, 1000);
+  const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+
+  async function getAnswer(prompt) {
+    const apiKey = await new Promise(resolve => {
+      chrome.runtime.sendMessage({ type: "get_api_key" }, response => {
+        resolve(response ? response.apiKey : null);
+      });
     });
+
+    if (!apiKey) {
+      console.error("Scene-sible: API Key not found. Please set it in the extension popup.");
+      return {
+        "morality_scale": 0,
+        "watchability": 0,
+        "sexual_activity": [],
+        "nudity": [],
+        "kissing": [{ "timestamp": "N/A", "hint": "API Key not set. Click the extension icon to set it." }]
+      };
+    }
+
+    const API_URL = `${GEMINI_API_BASE_URL}?key=${apiKey}`;
+
+    const systemPrompt = `You are an expert movie analyst providing information based on Catholic moral ethics. Analyze the following movie title. Respond ONLY with a single, valid JSON object that follows this exact schema: {
+      "type": "OBJECT",
+      "properties": {
+        "morality_scale": { "type": "NUMBER", "description": "1-10 rating based on Catholic moral ethics." },
+        "watchability": { "type": "NUMBER", "description": "1-10 rating of how watchable the movie is without falling into a near occasion of sin." },
+        "sexual_activity": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
+            "required": ["timestamp", "hint"]
+          }
+        },
+        "nudity": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
+            "required": ["timestamp", "hint"]
+          }
+        },
+        "kissing": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
+            "required": ["timestamp", "hint"]
+          }
+        }
+      },
+      "required": ["morality_scale", "watchability", "sexual_activity", "nudity", "kissing"]
+    }. Do not add any other text, explanation, or markdown formatting. Your entire response must be ONLY the JSON object.`;
+
+    const responseSchema = {
+      type: "OBJECT",
+      properties: {
+        "morality_scale": { "type": "NUMBER" },
+        "watchability": { "type": "NUMBER" },
+        "sexual_activity": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": {
+              "timestamp": { "type": "STRING" },
+              "hint": { "type": "STRING" }
+            },
+            "required": ["timestamp", "hint"]
+          }
+        },
+        "nudity": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": {
+              "timestamp": { "type": "STRING" },
+              "hint": { "type": "STRING" }
+            },
+            "required": ["timestamp", "hint"]
+          }
+        },
+        "kissing": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": {
+              "timestamp": { "type": "STRING" },
+              "hint": { "type": "STRING" }
+            },
+            "required": ["timestamp", "hint"]
+          }
+        }
+      },
+      "required": ["morality_scale", "watchability", "sexual_activity", "nudity", "kissing"]
+    };
+
+    const payload = {
+      contents: [{
+        parts: [{
+          text: prompt
+        }]
+      }],
+      systemInstruction: {
+        parts: [{
+          text: systemPrompt
+        }]
+      },
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: responseSchema,
+        temperature: 0.1
+      }
+    };
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("API Error Response:", errorBody);
+        return {
+          "morality_scale": 0,
+          "watchability": 0,
+          "sexual_activity": [],
+          "nudity": [],
+          "kissing": [{ "timestamp": "N/A", "hint": `API Error: ${response.status}. Check key or console.` }]
+        };
+      }
+
+      const result = await response.json();
+      const candidate = result.candidates?.[0];
+
+      if (candidate && candidate.content?.parts?.[0]?.text) {
+        const jsonText = candidate.content.parts[0].text;
+        const parsedJson = JSON.parse(jsonText);
+        return parsedJson;
+      } else {
+        console.error("Invalid API response structure:", result);
+        return null;
+      }
+
+    } catch (error) {
+      console.error("Error during fetch call:", error);
+      return null;
+    }
   }
 
   function getRenderedContent(data) {
@@ -134,7 +275,7 @@ if (!shareButton || !topstuff) {
             <div class="hdzaWe">
                 <div class="OZ9ddf WAUd4">
                     <div class="nk9vdc GYaNDc" style="flex-grow:1">
-                        <svg class="fWWlmf JzISke" height="22" width="22" aria-hidden="true" viewBox="0 0 471 471" xmlns="http://www.w3.org/2000/svg"><path fill="var(--m3c23)" d="M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z"></path></svg>
+                      <svg class="fWWlmf JzISke" height="22" width="22" aria-hidden="true" viewBox="0 0 471 471" xmlns="http://www.w3.org/2000/svg"><path fill="var(--m3c23)" d="M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z"></path></svg>
                         <div class="Fzsovc" role="heading" aria-level="2">Scene-sible Score</div>
                     </div>
                 </div>
@@ -178,8 +319,8 @@ if (!shareButton || !topstuff) {
       aiResult.style.opacity = "1";
     });
 
-    const movieTitleInput = document.querySelector('input[name="q"]');
-    const movieTitle = movieTitleInput ? movieTitleInput.value : "Unknown Movie";
+    const movieTitleElement = document.querySelector('[data-attrid="title"]');
+    const movieTitle = movieTitleElement ? movieTitleElement.innerText : "Unknown Movie";
     const data = await getAnswer(movieTitle);
 
     if (aiResult.style.display !== "block" || !data) {
