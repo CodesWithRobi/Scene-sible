@@ -111,158 +111,17 @@ if (!shareButton || !topstuff) {
       </div>
   `;
 
-  const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
-
   async function getAnswer(prompt) {
-    const apiKey = await new Promise(resolve => {
-      chrome.runtime.sendMessage({ type: "get_api_key" }, response => {
-        resolve(response ? response.apiKey : null);
+    return new Promise((resolve) => {
+      browser.runtime.sendMessage({ type: "fetch_movie_data", movieTitle: prompt }, response => {
+        if (browser.runtime.lastError) {
+          console.error("Error sending message to background script:", browser.runtime.lastError);
+          resolve(null);
+        } else {
+          resolve(response);
+        }
       });
     });
-
-    if (!apiKey) {
-      console.error("Scene-sible: API Key not found. Please set it in the extension popup.");
-      return {
-        "morality_scale": 0,
-        "watchability": 0,
-        "sexual_activity": [],
-        "nudity": [],
-        "kissing": [{ "timestamp": "N/A", "hint": "API Key not set. Click the extension icon to set it." }]
-      };
-    }
-
-    const API_URL = `${GEMINI_API_BASE_URL}?key=${apiKey}`;
-
-    const systemPrompt = `You are an expert movie analyst providing information based on Catholic moral ethics. Analyze the following movie title. Respond ONLY with a single, valid JSON object that follows this exact schema: {
-      "type": "OBJECT",
-      "properties": {
-        "morality_scale": { "type": "NUMBER", "description": "1-10 rating based on Catholic moral ethics." },
-        "watchability": { "type": "NUMBER", "description": "1-10 rating of how watchable the movie is without falling into a near occasion of sin." },
-        "sexual_activity": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
-            "required": ["timestamp", "hint"]
-          }
-        },
-        "nudity": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
-            "required": ["timestamp", "hint"]
-          }
-        },
-        "kissing": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
-            "required": ["timestamp", "hint"]
-          }
-        }
-      },
-      "required": ["morality_scale", "watchability", "sexual_activity", "nudity", "kissing"]
-    }. Do not add any other text, explanation, or markdown formatting. Your entire response must be ONLY the JSON object.`;
-
-    const responseSchema = {
-      type: "OBJECT",
-      properties: {
-        "morality_scale": { "type": "NUMBER" },
-        "watchability": { "type": "NUMBER" },
-        "sexual_activity": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": {
-              "timestamp": { "type": "STRING" },
-              "hint": { "type": "STRING" }
-            },
-            "required": ["timestamp", "hint"]
-          }
-        },
-        "nudity": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": {
-              "timestamp": { "type": "STRING" },
-              "hint": { "type": "STRING" }
-            },
-            "required": ["timestamp", "hint"]
-          }
-        },
-        "kissing": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": {
-              "timestamp": { "type": "STRING" },
-              "hint": { "type": "STRING" }
-            },
-            "required": ["timestamp", "hint"]
-          }
-        }
-      },
-      "required": ["morality_scale", "watchability", "sexual_activity", "nudity", "kissing"]
-    };
-
-    const payload = {
-      contents: [{
-        parts: [{
-          text: prompt
-        }]
-      }],
-      systemInstruction: {
-        parts: [{
-          text: systemPrompt
-        }]
-      },
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: responseSchema,
-        temperature: 0.1
-      }
-    };
-
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-        console.error("API Error Response:", errorBody);
-        return {
-          "morality_scale": 0,
-          "watchability": 0,
-          "sexual_activity": [],
-          "nudity": [],
-          "kissing": [{ "timestamp": "N/A", "hint": `API Error: ${response.status}. Check key or console.` }]
-        };
-      }
-
-      const result = await response.json();
-      const candidate = result.candidates?.[0];
-
-      if (candidate && candidate.content?.parts?.[0]?.text) {
-        const jsonText = candidate.content.parts[0].text;
-        const parsedJson = JSON.parse(jsonText);
-        return parsedJson;
-      } else {
-        console.error("Invalid API response structure:", result);
-        return null;
-      }
-
-    } catch (error) {
-      console.error("Error during fetch call:", error);
-      return null;
-    }
   }
 
   function getRenderedContent(data) {
@@ -276,7 +135,7 @@ if (!shareButton || !topstuff) {
                 <div class="OZ9ddf WAUd4">
                     <div class="nk9vdc GYaNDc" style="flex-grow:1">
                       <svg class="fWWlmf JzISke" height="22" width="22" aria-hidden="true" viewBox="0 0 471 471" xmlns="http://www.w3.org/2000/svg"><path fill="var(--m3c23)" d="M235.5 471C235.5 438.423 229.22 407.807 216.66 379.155C204.492 350.503 187.811 325.579 166.616 304.384C145.421 283.189 120.498 266.508 91.845 254.34C63.1925 241.78 32.5775 235.5 0 235.5C32.5775 235.5 63.1925 229.416 91.845 217.249C120.498 204.689 145.421 187.811 166.616 166.616C187.811 145.421 204.492 120.497 216.66 91.845C229.22 63.1925 235.5 32.5775 235.5 0C235.5 32.5775 241.584 63.1925 253.751 91.845C266.311 120.497 283.189 145.421 304.384 166.616C325.579 187.811 350.503 204.689 379.155 217.249C407.807 229.416 438.423 235.5 471 235.5C438.423 235.5 407.807 241.78 379.155 254.34C350.503 266.508 325.579 283.189 304.384 304.384C283.189 325.579 266.311 350.503 253.751 379.155C241.584 407.807 235.5 438.423 235.5 471Z"></path></svg>
-                        <div class="Fzsovc" role="heading" aria-level="2">Scene-sible Score</div>
+                        <div class="Fzsovc" role="heading" aria-level="2">Calculated strategies to avoid near occasions..</div>
                     </div>
                 </div>
                 <div class="GkDqAd">

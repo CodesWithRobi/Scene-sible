@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Scene-sible",
   "version": "1.0",
   "author": "Robinson J",
@@ -9,13 +9,12 @@
   },
   "permissions": [
     "activeTab",
-    "storage"
-  ],
-  "host_permissions": [
-    "https://www.google.com/search*"
+    "storage",
+    "https://www.google.com/search*",
+    "https://generativelanguage.googleapis.com/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
   },
   "content_scripts": [
     {
@@ -27,7 +26,7 @@
       ]
     }
   ],
-  "action": {
+  "browser_action": {
     "default_icon": "icons/icon.png",
     "default_popup": "popup/popup.html"
   }
