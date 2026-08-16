@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Scene-sible",
-  "version": "1.0",
+  "version": "2.0",
   "author": "Robinson J",
   "homepage_url": "https://github.com/CodesWithRobi/Scene-sible",
   "icons": {
@@ -13,17 +13,30 @@
   ],
   "host_permissions": [
     "https://www.google.com/search?*",
-    "https://generativelanguage.googleapis.com/*"
+    "https://www.google.co.in/search?*",
+    "https://www.google.co.uk/search?*",
+    "https://www.google.ca/search?*",
+    "https://www.google.com.au/search?*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://oai.endpoints.kepler.ai.cloud.ovh.net/*",
+    "https://openrouter.ai/*",
+    "https://api.openai.com/*",
+    "https://api.anthropic.com/*"
   ],
   "background": {
     "scripts": [
+      "background/providers.js",
       "background.js"
     ]
   },
   "content_scripts": [
     {
       "matches": [
-        "https://www.google.com/search?*"
+        "https://www.google.com/search?*",
+        "https://www.google.co.in/search?*",
+        "https://www.google.co.uk/search?*",
+        "https://www.google.ca/search?*",
+        "https://www.google.com.au/search?*"
       ],
       "js": [
         "content_scripts/scene_sible.js"
@@ -46,6 +59,9 @@
           "none"
         ]
       }
+    },
+    "gecko_android": {
+      "strict_min_version": "113.0"
     }
   }
 }

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scene-sible content script harness</title>
+</head>
+<body>
+  <!-- Replica of Google's knowledge-panel DOM (verified live Aug 2026) -->
+  <div id="topstuff"></div>
+  <div id="center_col">
+    <div data-attrid="title" class="PZPZlf ssJ7i B5dxMb"><span class="DoxwDb"><h1>Interstellar</h1></span></div>
+    <div data-attrid="kc:/film/film:cast">Cast block</div>
+    <div data-md="371">Where to watch</div>
+    <div id="share-host"><div aria-label="Share" class="apFnFf"><svg><path d="Moriginal-share-icon"/></svg></div></div>
+  </div>
+
+  <script>
+    if (new URLSearchParams(location.search).has("nomovie")) {
+      // simulate a non-movie result: no title attrid, no movie signal
+      const col = document.getElementById("center_col");
+      col.innerHTML =
+        '<div data-attrid="description" class="PZPZlf">Albert Einstein was a physicist</div>' +
+        '<div aria-label="Share" class="apFnFf"><svg><path d="Mx"/></svg></div>';
+      document.getElementById("share-host").innerHTML = "";
+    } else if (new URLSearchParams(location.search).has("noshare")) {
+      document.getElementById("share-host").innerHTML = "";
+    }
+  </script>
+
+  <script>
+    window.browser = {
+      runtime: {
+        lastError: null,
+        sendMessage: (msg, cb) => setTimeout(() => cb({
+          summary: "A lovely romance undercut by body-swap groping comedy.",
+          morality_scale: 5,
+          watchability: 6,
+          sexual_activity: [{ timestamp: "~0:35:00", hint: "comedic groping during body-swap" }],
+          nudity: [],
+          kissing: [{ timestamp: "~1:42:00", hint: "brief, chaste kiss" }],
+          other_concerns: [{ timestamp: "Act 1", hint: "breast-touching humor" }],
+          _meta: { provider: "ovhcloud", model: "gpt-oss-20b" }
+        }), 60)
+      }
+    };
+  </script>
+  <script src="/content_scripts/scene_sible.js?v=10"></script>
+</body>
+</html>

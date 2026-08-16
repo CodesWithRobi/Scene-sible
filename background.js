@@ -1,178 +1,134 @@
-const GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+// background.js — message router for Scene-sible v2.
+// Depends on background/providers.js (loaded first in manifest, order matters).
 
-async function getMovieAnalysis(apiKey, movieTitle) {
-    const API_URL = `${GEMINI_API_BASE_URL}?key=${apiKey}`;
+"use strict";
 
-    const systemPrompt = `You are an expert movie analyst providing information based on Catholic moral ethics. Analyze the following movie title. Respond ONLY with a single, valid JSON object that follows this exact schema: {
-      "type": "OBJECT",
-      "properties": {
-        "morality_scale": { "type": "NUMBER", "description": "1-10 rating based on Catholic moral ethics." },
-        "watchability": { "type": "NUMBER", "description": "1-10 rating of how watchable the movie is without falling into a near occasion of sin." },
-        "sexual_activity": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
-            "required": ["timestamp", "hint"]
-          }
-        },
-        "nudity": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
-            "required": ["timestamp", "hint"]
-          }
-        },
-        "kissing": {
-          "type": "ARRAY",
-          "items": {
-            "type": "OBJECT",
-            "properties": { "timestamp": { "type": "STRING" }, "hint": { "type": "STRING" } },
-            "required": ["timestamp", "hint"]
-          }
-        }
-      },
-      "required": ["morality_scale", "watchability", "sexual_activity", "nudity", "kissing"]
-    }. Do not add any other text, explanation, or markdown formatting. Your entire response must be ONLY the JSON object.`;
+const DEFAULT_SETTINGS = {
+  provider: "ovhcloud",
+  keys: { google: "", openrouter: "", openai: "", anthropic: "" },
+  models: {
+    google: Providers.google.defaultModel,
+    openrouter: Providers.openrouter.defaultModel,
+    openai: Providers.openai.defaultModel,
+    anthropic: Providers.anthropic.defaultModel,
+    ovhcloud: Providers.ovhcloud.defaultModel
+  }
+};
 
-    const responseSchema = {
-        type: "OBJECT",
-        properties: {
-            "morality_scale": { "type": "NUMBER" },
-            "watchability": { "type": "NUMBER" },
-            "sexual_activity": {
-                "type": "ARRAY",
-                "items": {
-                    "type": "OBJECT",
-                    "properties": {
-                        "timestamp": { "type": "STRING" },
-                        "hint": { "type": "STRING" }
-                    },
-                    "required": ["timestamp", "hint"]
-                }
-            },
-            "nudity": {
-                "type": "ARRAY",
-                "items": {
-                    "type": "OBJECT",
-                    "properties": {
-                        "timestamp": { "type": "STRING" },
-                        "hint": { "type": "STRING" }
-                    },
-                    "required": ["timestamp", "hint"]
-                }
-            },
-            "kissing": {
-                "type": "ARRAY",
-                "items": {
-                    "type": "OBJECT",
-                    "properties": {
-                        "timestamp": { "type": "STRING" },
-                        "hint": { "type": "STRING" }
-                    },
-                    "required": ["timestamp", "hint"]
-                }
-            }
-        },
-        "required": ["morality_scale", "watchability", "sexual_activity", "nudity", "kissing"]
-    };
-
-    const payload = {
-        contents: [{
-            parts: [{
-                text: movieTitle
-            }]
-        }],
-        systemInstruction: {
-            parts: [{
-                text: systemPrompt
-            }]
-        },
-        generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: responseSchema,
-            temperature: 0.1
-        }
-    };
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            console.error("API Error Response:", errorBody);
-            return {
-                "morality_scale": 0,
-                "watchability": 0,
-                "sexual_activity": [],
-                "nudity": [],
-                "kissing": [{ "timestamp": "N/A", "hint": `API Error: ${response.status}. Check key or console.` }]
-            };
-        }
-
-        const result = await response.json();
-        const candidate = result.candidates?.[0];
-
-        if (candidate && candidate.content?.parts?.[0]?.text) {
-            const jsonText = candidate.content.parts[0].text;
-            const parsedJson = JSON.parse(jsonText);
-            return parsedJson;
-        } else {
-            console.error("Invalid API response structure:", result);
-            return null;
-        }
-
-    } catch (error) {
-        console.error("Error during fetch call:", error);
-        return null;
-    }
+function getDefaults() {
+  return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
 }
 
-
-// Listen for messages from the popup or content script
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "save_api_key") {
-    // Save the API key to browser.storage.local
-    browser.storage.local.set({ apiKey: request.apiKey }, () => {
-      console.log("API Key saved successfully.");
-      sendResponse({ status: "success" });
-    });
-    // Return true to indicate you wish to send a response asynchronously
-    return true;
-  } else if (request.type === "get_api_key") {
-    // Retrieve the API key from browser.storage.local
-    browser.storage.local.get("apiKey", (data) => {
-      if (data.apiKey) {
-        sendResponse({ apiKey: data.apiKey });
-      } else {
-        sendResponse({ apiKey: null });
-      }
-    });
-    // Return true to indicate you wish to send a response asynchronously
-    return true;
-  } else if (request.type === "fetch_movie_data") {
-    browser.storage.local.get("apiKey", (data) => {
-        if (data.apiKey) {
-            getMovieAnalysis(data.apiKey, request.movieTitle).then(analysis => {
-                sendResponse(analysis);
-            });
-        } else {
-            sendResponse({
-                "morality_scale": 0,
-                "watchability": 0,
-                "sexual_activity": [],
-                "nudity": [],
-                "kissing": [{ "timestamp": "N/A", "hint": "API Key not set. Click the extension icon to set it." }]
-            });
-        }
-    });
-    return true; // Indicates we will send a response asynchronously
+async function getSettings() {
+  const defaults = getDefaults();
+  const data = await browser.storage.local.get(null);
+  const stored = data.settings && typeof data.settings === "object" ? data.settings : {};
+  const settings = {
+    provider: Providers[stored.provider] ? stored.provider : defaults.provider,
+    keys: Object.assign({}, defaults.keys, stored.keys || {}),
+    models: Object.assign({}, defaults.models, stored.models || {})
+  };
+  // Migrate the v1 single-key storage shape.
+  if (data.apiKey && !settings.keys.google) {
+    settings.keys.google = String(data.apiKey);
   }
+  return settings;
+}
+
+// Business-card contract: every non-ok path returns the schema-shaped object
+// with a human-readable hint carried inside kissing[0].hint.
+function errorContract(hint) {
+  return {
+    morality_scale: 0,
+    watchability: 0,
+    sexual_activity: [],
+    nudity: [],
+    kissing: [{ timestamp: "N/A", hint }],
+    _meta: null
+  };
+}
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  (async () => {
+    try {
+      switch (request.type) {
+        case "get_settings": {
+          sendResponse(await getSettings());
+          break;
+        }
+
+        case "save_settings": {
+          const settings = await getSettings();
+          if (request.provider && Providers[request.provider]) settings.provider = request.provider;
+          if (typeof request.apiKey === "string" && Providers[settings.provider].needsKey) {
+            settings.keys[settings.provider] = request.apiKey.trim();
+          }
+          if (typeof request.model === "string" && request.model) settings.models[settings.provider] = request.model;
+          await browser.storage.local.set({ settings });
+          sendResponse({ ok: true });
+          break;
+        }
+
+        case "list_models": {
+          const provider = Providers[request.provider];
+          if (!provider) { sendResponse({ ok: false, error: "Unknown provider", models: [] }); return; }
+          const settings = await getSettings();
+          const apiKey = typeof request.apiKey === "string" ? request.apiKey : settings.keys[provider.id];
+          try {
+            const models = await provider.listModels(apiKey || "");
+            sendResponse({ ok: true, models });
+          } catch (err) {
+            sendResponse({
+              ok: false,
+              error: (err && err.message) || String(err),
+              models: CURATED_MODELS[provider.id] || []
+            });
+          }
+          break;
+        }
+
+        case "fetch_movie_data": {
+          const settings = await getSettings();
+          const provider = Providers[request.provider] || Providers[settings.provider];
+          const modelId = request.model || settings.models[provider.id] || provider.defaultModel;
+          const apiKey = settings.keys[provider.id] || "";
+
+          if (provider.needsKey && !apiKey) {
+            sendResponse(errorContract(
+              `${provider.label}: API key not set. Click the extension icon to add one.`
+            ));
+            return;
+          }
+
+          const result = await provider.analyze(apiKey, modelId, request.movieTitle);
+          if (result.ok) {
+            const d = result.data;
+            const isEmpty = d.morality_scale === 0 && d.watchability === 0 &&
+              Array.isArray(d.sexual_activity) && d.sexual_activity.length === 0 &&
+              Array.isArray(d.nudity) && d.nudity.length === 0 &&
+              Array.isArray(d.kissing) && d.kissing.length === 0;
+            if (isEmpty) {
+              sendResponse(errorContract(
+                `${provider.label}: returned an empty analysis. Try again in a moment.`
+              ));
+            } else {
+              sendResponse(Object.assign(result.data, { _meta: { provider: provider.id, model: modelId } }));
+            }
+          } else {
+            sendResponse(errorContract(result.hint));
+          }
+          break;
+        }
+
+        default:
+          sendResponse({ ok: false, error: "Unknown message type" });
+      }
+    } catch (err) {
+      console.error("Scene-sible background error:", err);
+      sendResponse(errorContract(
+        `Internal error: ${err && err.message ? err.message : String(err)}`
+      ));
+    }
+  })();
+  return true; // async response — must always return true
 });

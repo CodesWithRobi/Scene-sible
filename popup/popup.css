@@ -1,105 +1,301 @@
-/* Popup Styling */
-body {
-  font-family: "Poppins", sans-serif;
-  background-color: #20232a;
-  margin: 0;
+/* Scene-sible popup — soft minimal, theme-aware.
+   Flat, no gradients, no shadows, no glows. Warm stone neutrals.
+   Follows prefers-color-scheme (light + dark). Green/red appear only for
+   functional save-status feedback. */
+
+* {
+  box-sizing: border-box;
 }
 
-/* Popup container */
-.popup {
-  background-color: #282c34;
-  /* Deep gray-blue background */
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  /* Softer shadow */
+:root {
+  color-scheme: light dark;
+
+  /* text / border accents */
+  --ss-accent: #292524;
+  /* solid fills (buttons, active pill) */
+  --ss-solid: #292524;
+  --ss-solid-hover: #1c1917;
+  --ss-on-solid: #ffffff;
+  /* brand tile keeps a white star, so it stays mid-toned in dark mode */
+  --ss-brand: #292524;
+
+  --ss-text: #292524;
+  --ss-muted: #57534e;
+  --ss-faint: #a8a29e;
+  --ss-border: #ecebea;
+  --ss-border-strong: #e0dedc;
+  --ss-subtle: #f5f4f3;
+  --ss-bg: #faf9f8;
+  --ss-card: #ffffff;
+  --ss-ok: #059669;
+  --ss-error: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ss-accent: #e7e5e4;
+    --ss-solid: #e7e5e4;
+    --ss-solid-hover: #d6d3d1;
+    --ss-on-solid: #1c1917;
+    --ss-brand: #57534e;
+
+    --ss-text: #e7e5e4;
+    --ss-muted: #a8a29e;
+    --ss-faint: #78716c;
+    --ss-border: #3a3937;
+    --ss-border-strong: #444240;
+    --ss-subtle: #2f2e2c;
+    --ss-bg: #1c1b1a;
+    --ss-card: #262524;
+    --ss-ok: #34d399;
+    --ss-error: #f87171;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--ss-bg);
+  color: var(--ss-text);
+  width: 400px;
+  font-size: 13px;
+}
+
+.app {
+  padding: 20px 18px 18px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--ss-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.app-header p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ss-muted);
+}
+
+/* Panels */
+.card {
+  border: 1px solid var(--ss-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--ss-card);
+  color: var(--ss-text);
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ss-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-row .field-label {
+  margin-bottom: 0;
+}
+
+/* Provider pills */
+.provider-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  border: 1px solid var(--ss-border-strong);
+  background: var(--ss-subtle);
+  color: var(--ss-muted);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.pill:hover {
+  border-color: var(--ss-accent);
+  color: var(--ss-accent);
+}
+
+.pill.active {
+  background: var(--ss-solid);
+  border-color: var(--ss-solid);
+  color: var(--ss-on-solid);
+}
+
+/* Select */
+select {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--ss-border-strong);
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--ss-bg);
+  color: var(--ss-text);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a8a29e'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+select:focus,
+select:focus-visible {
+  outline: none;
+  border-color: var(--ss-accent);
+}
+
+select:disabled {
+  background: var(--ss-subtle);
+  color: var(--ss-faint);
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--ss-faint);
+  line-height: 1.4;
+}
+
+/* API key row */
+.key-row {
+  display: flex;
+  gap: 8px;
+}
+
+.key-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--ss-border-strong);
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: inherit;
+  background: var(--ss-bg);
+  color: var(--ss-text);
+}
+
+.key-row input:focus {
+  outline: none;
+  border-color: var(--ss-accent);
+}
+
+/* Buttons */
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--ss-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.link-btn:hover {
+  color: var(--ss-accent);
+  text-decoration: underline;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ss-solid);
+  color: var(--ss-on-solid);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.save-btn:hover {
+  background: var(--ss-solid-hover);
+}
+
+/* Free-tier note */
+.free-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ss-muted);
+  background: var(--ss-subtle);
+  border: 1px solid var(--ss-border);
+  border-radius: 12px;
+  padding: 9px 12px;
+}
+
+/* Status */
+.status {
+  margin: 10px 0 0;
+  min-height: 16px;
+  font-size: 12px;
   text-align: center;
 }
 
-/* Headline */
-.popup h1 {
-  margin-bottom: 20px;
-  font-size: 28px;
-  color: #61dafb;
-  /* Aesthetic light blue */
-  font-weight: bold;
+.status.ok {
+  color: var(--ss-ok);
 }
 
-/* Paragraph text */
-.popup p {
-  font-size: 18px;
-  color: #abb2bf;
-  /* Softer light gray for paragraph text */
-  margin-bottom: 30px;
+.status.error {
+  color: var(--ss-error);
 }
 
-/* Input and Button Styling */
-.api-key-container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+/* Footer */
+.app-footer {
+  margin-top: 14px;
+  border-top: 1px solid var(--ss-border);
+  padding-top: 12px;
+  text-align: center;
+  font-size: 12px;
 }
 
-#apiKey {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #61dafb;
-  border-radius: 5px;
-  background-color: #20232a;
-  color: #abb2bf;
-  font-size: 14px;
-}
-
-#saveBtn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  background-color: #61dafb;
-  color: #20232a;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-#saveBtn:hover {
-  background-color: #4a9cb3;
-}
-
-.status {
-  font-size: 14px;
-  color: #61dafb;
-  min-height: 20px;
-}
-
-/* Button styling */
-.popup a {
-  display: inline-block;
-  margin: 10px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #fff;
+.app-footer a {
+  color: var(--ss-muted);
   text-decoration: none;
-  border-radius: 30px;
-  /* Rounded buttons */
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  font-weight: 500;
 }
 
-.github {
-  background-color: #333;
+.app-footer a:hover {
+  color: var(--ss-accent);
 }
 
-.linkedin {
-  background-color: #0077b5;
-}
-
-/* Button hover effects */
-.popup a:hover {
-  background-color: #61dafb;
-  /* Light blue hover for a consistent theme */
-  color: #20232a;
-  /* Text changes to background color */
-  box-shadow: 0 0 20px rgba(97, 218, 251, 0.6);
-  /* Cool glow effect */
+.app-footer .dot {
+  color: var(--ss-border-strong);
+  margin: 0 8px;
 }
